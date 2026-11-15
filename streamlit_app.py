@@ -7,7 +7,7 @@ st.set_page_config(page_title="AI Pribadi Navis", page_icon="🤖", layout="cent
 st.title("🤖 AI Pribadi Navis")
 st.write("Halo Beh! Sekarang aku sudah aktif dan siap diajar ngobrol cerdas.")
 
-# Sediakan tempat buat ngetik API Key langsung di sidebar web (supaya gampang diisi lewat HP)
+# Sediakan tempat buat ngetik API Key langsung di sidebar web
 with st.sidebar:
     st.header("⚙️ Pengaturan AI")
     api_key_input = st.text_input("Masukkan Google Gemini API Key:", type="password")
@@ -19,10 +19,10 @@ else:
     try:
         # Konfigurasi API Key dari input pengguna
         genai.configure(api_key=api_key_input)
-        
+
         # Inisialisasi model AI
         model = genai.GenerativeModel("gemini-2.5-flash")
-        
+
         # Simpan riwayat obrolan di sesi layar
         if "messages" not in st.session_state:
             st.session_state.messages = []
@@ -32,7 +32,7 @@ else:
             with st.chat_message(message["role"]):
                 st.markdown(message["content"])
 
-        # Kotak input chat di bagian bawah (tampilannya persis kayak aplikasi chat sungguhan!)
+        # Kotak input chat di bagian bawah
         if prompt := st.chat_input("Ketik pesan atau pertanyaanmu di sini, Beh..."):
             # Tambah pesan user ke layar
             st.session_state.messages.append({"role": "user", "content": prompt})
@@ -43,13 +43,12 @@ else:
             with st.chat_message("assistant"):
                 with st.spinner("Sedang berpikir..."):
                     chat_session = model.start_chat(history=[])
-                    # Mengirim riwayat atau pesan baru
-                    response = model.generate_content(prompt)
+                    response = chat_session.send_message(prompt)
                     bot_reply = response.text
                     st.markdown(bot_reply)
-            
+
             # Simpan jawaban bot ke riwayat
             st.session_state.messages.append({"role": "assistant", "content": bot_reply})
-            
+
     except Exception as e:
         st.error(f"Terjadi kesalahan pada API Key atau koneksi: {e}")
